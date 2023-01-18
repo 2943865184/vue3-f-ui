@@ -1,0 +1,19 @@
+# 忽略目录
+.idea
+.vscode
+build/
+src/
+packages/
+public/
+node_modules/
+typings/
+docs/
+script/
+# 忽略指定文件
+index.html
+tsconfig.json
+.gitignore
+.browserslistrc
+*.map
+package-lock.json
+tsconfig.node.json
