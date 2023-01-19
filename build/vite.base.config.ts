@@ -13,7 +13,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@packages": path.resolve(__dirname, '../packages'),
-      "@examples": path.relative(__dirname,'../examples')
+      "@examples": path.relative(__dirname, '../examples'),
+      "@public": path.relative(__dirname, '../public')
     }
   }
 })

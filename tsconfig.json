@@ -22,6 +22,9 @@
     ],
     "@examples/*": [
       "examples/*"
+    ],
+    "@public/*": [
+      "public/*"
     ]
   },
   "include": [

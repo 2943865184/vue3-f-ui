@@ -5,6 +5,7 @@ import baseConfig from './vite.base.config';
 export default defineConfig({
     ...baseConfig,
     server: {
-        open: '../public/index.html'
+        open: '../public/index.html',
+
     }
 })

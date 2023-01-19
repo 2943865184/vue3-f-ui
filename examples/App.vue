@@ -1,10 +1,11 @@
 <template>
-  <div class="my-kit-doc">
+  <div class="content">
     <aside>
-      <router-link v-for="(link, index) in data.links" :key="index" :to="link.path">{{ link.name }}</router-link>
-      <router-link to="/components/Button">11</router-link>
+      <router-link class="options" v-for="(link, index) in data.links" :key="index" :to="link.path">{{
+        link.name
+      }}</router-link>
+      <router-link class="options" to="/components/Button">11</router-link>
     </aside>
-    <!-- <f-button>2</f-button> -->
     <main>
       <router-view></router-view>
     </main>
@@ -24,20 +25,36 @@ const data = reactive({
 </script>
 
 <style lang="less">
-html,
-body {
-  margin: 0;
-  padding: 0;
+h1{
+  font-size: 30px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 15px;
 }
 
-.my-kit-doc {
+.content {
   display: flex;
-  min-height: 100vh;
+  // min-height: 100vh;
 
   aside {
+
     width: 200px;
-    padding: 15px;
+    // padding: 15px;
     border-right: 1px solid #ccc;
+
+    .options {
+      cursor: pointer;
+      display: block;
+      margin-bottom: 10px;
+      height: 50px;
+      text-align: center;
+      line-height: 45px;
+      font-size: 24px;
+
+      &:hover {
+        background: #ddd;
+      }
+    }
   }
 
   main {
