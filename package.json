@@ -1,15 +1,21 @@
 {
   "name": "vue3-f-ui",
   "private": false,
-  "version": "0.0.8",
+  "version": "0.0.0",
   "type": "module",
-  "description": "基于Vue3的ui组件库",
+  "description": "基于Vue3 + Vite + TS的ui组件库",
   "module": "lib/vue3-f-ui.es.js",
   "main": "lib/vue3-f-ui.umd.js",
   "types": "lib/index.d.ts",
+  "author": {
+    "name": "fjiajun",
+    "email": "2943865184@qq.com"
+  },
+  "resolved": {
+    
+  },
   "license": "MIT",
   "scripts": {
-
     "dev": "vite --host --config ./build/vite.dev.config.ts",
     "build:lib": "vue-tsc --noEmit && vite build --config ./build/vite.lib.config.ts",
     "build:doc": "vue-tsc --noEmit && vite build --config ./build/vite.doc.config.ts"
@@ -17,7 +23,6 @@
   "dependencies": {
     "@types/prismjs": "^1.25.0",
     "prismjs": "^1.25.0",
-    
     "vue": "^3.2.45"
   },
   "devDependencies": {
