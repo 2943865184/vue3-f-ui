@@ -47,6 +47,7 @@ onBeforeMount(() => {
             background: rgba(0, 0, 0, 0.2);
         }
     }
+
     &:hover {
         opacity: 0.8;
     }
@@ -78,11 +79,20 @@ onBeforeMount(() => {
     &:hover {
         color: #409eff;
         background: #ECF5FF;
-        border :1px solid #a0cfff;
+        border: 1px solid #a0cfff;
     }
-    &:active{
+
+    &:active {
         border: 1px solid #409eff;
     }
+}
+
+.primaryType,
+.successType,
+.infoType,
+.warningType,
+.dangerType {
+    border: 0;
 }
 
 .primaryType {
