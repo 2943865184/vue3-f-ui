@@ -10,5 +10,11 @@
     "compZhName": "链接",
     "compDesc": "这是一个按钮",
     "compClassName": "link"
+  },
+  {
+    "compName": "Table",
+    "compZhName": "列表",
+    "compDesc": "这是一个按钮",
+    "compClassName": "table"
   }
 ]

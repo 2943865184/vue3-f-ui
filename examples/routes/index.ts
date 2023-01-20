@@ -12,8 +12,14 @@ const routes = [
         name: 'Link',
         path: '/components/Link',
         component: () => import(`../../packages/Link/docs/README.md`)
+    },
+    {
+        title: '列表',
+        name: 'Table',
+        path: '/components/Table',
+        component: () => import(`../../packages/Table/docs/README.md`)
     }
-]; 
+];
 
 const routerConfig = {
     history: createWebHashHistory(),
