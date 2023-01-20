@@ -8,18 +8,21 @@
   
 <script lang="ts" setup>
 import { onBeforeMount, reactive } from 'vue'
-import { buttonSizeJudge, buttonTypeJudge, buttonSizeClass, buttonTypeClass } from './index'
+
+import { typeJudge, sizeJudge, sizeClass, typeClass } from '../../public/typescript/index'
 const props = defineProps(['size', 'type'])
 
-let buttonSizeClass: buttonSizeClass
-let buttonTypeClass: buttonTypeClass
+let buttonSizeClass: sizeClass
+let buttonTypeClass: typeClass
+
+
 
 // 初始化方法 
 function initialization() {
 
-    buttonSizeClass = buttonSizeJudge(props)
+    buttonSizeClass = sizeJudge(props)
 
-    buttonTypeClass = buttonTypeJudge(props)
+    buttonTypeClass = typeJudge(props)
 
 }
 
