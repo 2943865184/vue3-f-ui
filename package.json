@@ -1,11 +1,12 @@
 {
   "name": "vue3-f-ui",
   "private": false,
-  "version": "0.1.2",
+  "version": "0.1.4",
   "type": "module",
   "description": "基于Vue3 + Vite + TS的ui组件库",
   "module": "lib/vue3-f-ui.es.js",
   "main": "lib/vue3-f-ui.umd.js",
+
   "types": "lib/index.d.ts",
   "author": {
     "name": "fjiajun",

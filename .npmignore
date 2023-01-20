@@ -9,6 +9,7 @@ node_modules/
 typings/
 docs/
 script/
+examples/
 # 忽略指定文件
 index.html
 tsconfig.json

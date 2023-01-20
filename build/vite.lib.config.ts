@@ -38,6 +38,6 @@ export default defineConfig({
   },
   plugins: [
     ...baseConfig.plugins,
-    dts(),
+    // dts(),
   ]
 });
