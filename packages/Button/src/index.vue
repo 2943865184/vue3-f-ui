@@ -38,6 +38,7 @@ onBeforeMount(() => {
     color: #fff;
     border-radius: 3px;
     overflow: hidden;
+    cursor: pointer;
 
     .f-button-mask {
         position: absolute;
