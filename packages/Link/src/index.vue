@@ -1,5 +1,7 @@
 <template>
-    
+    <a href="">
+        <slot></slot>
+    </a>
 </template>
 <script lang="ts" setup>
 

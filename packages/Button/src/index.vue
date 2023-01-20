@@ -77,13 +77,13 @@ onBeforeMount(() => {
     border: 1px solid rgba(0, 0, 0, 0.2);
 
     &:hover {
-        color: #409eff;
+        color: @primaryColor;
         background: #ECF5FF;
         border: 1px solid #a0cfff;
     }
 
     &:active {
-        border: 1px solid #409eff;
+        border: 1px solid @primaryColor;
     }
 }
 
@@ -96,22 +96,22 @@ onBeforeMount(() => {
 }
 
 .primaryType {
-    background: #409eff;
+    background: @primaryColor;
 }
 
 .successType {
-    background: #67c23a;
+    background: @successColor;
 }
 
 .infoType {
-    background: #909399;
+    background: @infoColor
 }
 
 .warningType {
-    background: #E6A23C;
+    background: @warningColor;
 }
 
 .dangerType {
-    background: #F56C6C;
+    background: @dangerColor;
 }
 </style>
