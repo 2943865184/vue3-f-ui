@@ -32,6 +32,7 @@ onBeforeMount(() => {
     display: inline-block;
     border-bottom: 1px solid rgba(0, 0, 0, 0);
     padding: 2px 0 1px 0;
+    cursor: pointer;
 
     &:hover {
         opacity: 0.8;
