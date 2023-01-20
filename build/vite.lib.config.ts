@@ -28,7 +28,7 @@ export default defineConfig({
               declaration: true,
             },
             'include': [
-              '../packages/*.ts',
+              '../packages/index.ts',
             ],
           },
           abortOnError: false,
@@ -38,6 +38,6 @@ export default defineConfig({
   },
   plugins: [
     ...baseConfig.plugins,
-    dts(),
+    // dts(),
   ]
 });
