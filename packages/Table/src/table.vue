@@ -1,35 +1,62 @@
 <template>
     <div class="f-table">
-        <slot></slot>
-        <tableColumn></tableColumn>
+        <!-- 头部 -->
+        <div class="headerWrapper">
+            <TableHeader :store="store" />
+        </div>
+        <!-- 身体 -->
+        <div class="bodyWrapper">
+            <TableBody :store="store" />
+        </div>
+
+        <!-- 底部 -->
+        <div class="footWrapper"></div>
     </div>
 </template>
 <script lang="ts" >
-import { onBeforeMount, defineComponent } from 'vue'
+import { defineComponent, render, } from 'vue'
 import { typeJudge, typeClass } from '../../public/typescript/index'
-import { underlineClass } from '../../public/typescript/index'
-import tableColumn from './table-column'
+import { underlineClass, store } from '../../public/typescript/index'
+import { getTableRenderData } from '../../public/typescript/index'
+import TableColumn from './table-column'
+import TableHeader from './table-header'
+import TableBody from './table-body'
 
 export default defineComponent({
     props: ['data'],
-    setup(props) {
+    components: {
+        TableColumn,
+        TableHeader,
+        TableBody
+    },
+    setup(props, { slots }) {
 
-        function initialization() { }
+        let store: store | unknown
+
+        /**
+         * 初始化方法
+         */
+        function initialization() {
+            store = getTableRenderData(slots, props)
+
+        }
+
+        initialization()
+
         return {
-            initialization
+            initialization,
+            store,
+            render
+
         }
     },
-    onBeforeMount() {
-        this.initialization()
-    }
+
 })
 
 
 
 </script>
 
-<style>
-.f-table {
-    display: flex;
-}
+<style scoped lang="less">
+
 </style>

@@ -1,28 +1,14 @@
 
 
-import { onBeforeMount, defineComponent } from 'vue'
+import { defineComponent } from 'vue'
 import { typeJudge, typeClass } from '../../public/typescript/index'
 import { underlineClass } from '../../public/typescript/index'
 
 export default defineComponent({
-    name: "FTableColumn",
-    props: ['prop', 'label'],
+    name: 'f-table-column',
+    props: ['prop', 'label', 'width'],
     setup(props) {
-
-
-
-        function initialization() {
-
-        }
-
-        onBeforeMount(() => {
-            initialization()
-        })
-
     }
 
+
 })
-
-
-
-
