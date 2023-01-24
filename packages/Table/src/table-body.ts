@@ -42,10 +42,11 @@ export default defineComponent({
                                         ]
                                     )
                                 })
-                            ])
+                            ]
+                        )
                     })
-                ]),
-
+                ]
+            ),
         ]
     }
 })
