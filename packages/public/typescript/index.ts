@@ -1,4 +1,4 @@
-import { Slots } from 'vue'
+import { Slots, ref, Ref, UnwrapRef } from 'vue'
 type sizeClassKeys = 'defaultSize' | 'largeSize' | 'smallSize'
 type typeClassKeys = 'defaultType' | 'primaryType' | 'successType' | 'infoType' | 'warningType' | 'dangerType'
 type underlineClassKeys = 'deleteUnderline'
@@ -18,6 +18,25 @@ export interface TableProps {
     data: Array<TablePropsObject>
 }
 
+export interface VueDomValue extends Element {
+    children: Array<VueDom> & VueDomChildren
+    
+}
+export interface VueDomChildren {
+    namedItem: (name: string) => Element | null
+    item: (index: number) => Element | null
+
+}
+
+export interface VueDom extends HTMLInputElement {
+    value: string & VueDomValue
+    children: Array<VueDomValue> & VueDomChildren
+
+}
+
+
+
+
 interface columnData {
     title: string
     data: Array<string | number | boolean>,
@@ -26,10 +45,12 @@ interface columnData {
 
 
 export interface store {
-    tableHeader?: Array<string>
-    tableData?: Array<object>
+    tableColumnName?: Array<string>
+    tableColumnData?: Array<object>
     tableColumnSlots?: Array<object>
     tableColumnProp?: Array<string>
+    tableColumnWidth?: Array<string>
+    testData?: Array<TablePropsObject>
 }
 
 
@@ -84,60 +105,86 @@ export function sizeJudge(props: buttonProps): sizeClass {
     return buttonSizeClass
 }
 /**
- * 获取表格渲染数据
- * @return tableList 表格数据
+ * table组件数据处理
+ * @return store 处理完毕后的数据存放对象
  */
 export function getTableRenderData(slots: Slots, props: TableProps): store {
-    let tableList: store = {
-        tableHeader: [],
-        tableData: [],
-        tableColumnSlots: [],
-        tableColumnProp: []
+    let store: store = {
+        tableColumnName: [],      // 列名
+        tableColumnData: [],  // 表格渲染数据
+        tableColumnSlots: [], // 表格列插槽
+        tableColumnProp: [],  // 表格列传入的数据
+        tableColumnWidth: [],  // 表格列宽度
+        testData: []
     }
+
+
     if (slots?.default) {
         slots.default().find((item: any) => {
-            // console.log(item.props?.label);
 
-            if (item.props?.label && item.props?.prop) {
-                console.log(1);
+            // 列名
+            if (item.props.label) {
+                store.tableColumnName?.push(item.props.label)
+            } else {
+                store.tableColumnName?.push('')
+            }
 
-                // 获取列标题
-                if (item.props?.label) {
-                    tableList.tableHeader?.push(item.props.label)
-                }
-                // 获取列prop
-                if (item.props?.prop) {
-                    tableList.tableColumnProp?.push(item.props.prop)
-                }
+            // 列数据源的key名
+            if (item.props.prop) {
+                store.tableColumnProp?.push(item.props.prop)
+            } else {
+                store.tableColumnProp?.push('')
+            }
 
-                // 获取插槽
-                tableList.tableColumnSlots?.push(item.children)
-
+            // 列宽度
+            if (item.props.width) {
+                store.tableColumnWidth?.push(item.props.width)
+            } else {
+                store.tableColumnWidth?.push('')
             }
 
 
+            // 列插槽
+            store.tableColumnSlots?.push(item.children)
+
         })
+    }
 
-        // 处理表格数据
-        let arr = []
+    // 处理渲染数据
+    if (store.tableColumnProp) {
         for (const key in props.data) {
-            let tempArr = []
+            let tempArr: any = []
 
-            for (const key2 in tableList.tableColumnProp) {
+            for (const key2 in props.data) {
 
-                if (props.data[key][tableList.tableColumnProp[parseInt(key2)]]) {
-
-                    tempArr.push(props.data[key][tableList.tableColumnProp[parseInt(key2)]])
+                if (props.data[key2][store.tableColumnProp[key]]) {
+                    tempArr.push(props.data[key2][store.tableColumnProp[key]])
                 } else {
                     tempArr.push('')
                 }
+
             }
-            arr.push(tempArr)
-            tempArr = []
+            store.tableColumnData?.push(tempArr)
         }
-        tableList.tableData = arr
     }
 
-    return tableList
+    return store
 
+}
+/**
+ * header 和 body 列宽度同步
+ * @param bodyDom 
+ * @param headerDom 
+ */
+export function widthSynchronization<T extends VueDom | null>(headerDom: T, bodyDom: T): T {
+
+    if (bodyDom && headerDom) {
+        for (let i = 0; i < bodyDom.children[0].children.length; i++) {
+
+            headerDom.children[0].children[i].style.width = `${bodyDom?.children[0].children[i].clientWidth}px`
+
+        }
+    }
+
+    return headerDom
 }

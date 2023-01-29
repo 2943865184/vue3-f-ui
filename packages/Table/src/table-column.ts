@@ -8,6 +8,8 @@ export default defineComponent({
     name: 'f-table-column',
     props: ['prop', 'label', 'width'],
     setup(props) {
+
+        
     }
 
 
