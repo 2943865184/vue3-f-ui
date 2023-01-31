@@ -13,39 +13,41 @@ export default defineComponent({
      */
     render() {
         let { props } = this
-        let count: number = -1
-
+        let count: number
         return h(
             'div',
             {
                 class: 'f-table-body',
                 style: {
-                    display: 'flex',
+                    display: 'block',
                 }
             },
             [
-                props.store.tableColumnData.map((columnData: any) => {
-                    count++
+                props.store.testData.map((column: any) => {
+                    // console.log(props.store.tableColumnWidth);
 
+                    count = -1
                     return h(
                         'div',
                         {
                             class: 'f-table-column',
                             style: {
-                                display: 'inline-block',
-                                width: props.store.tableColumnWidth[count],
-                                overflow:'hidden'
+                                display: 'flex',
+                                // overflow: 'hidden'
                             }
                         },
                         [
-                            columnData.map((cell: any) => {
-
+                            column.map((cell: any) => {
+                                count++
                                 return h(
                                     'div',
                                     {
                                         class: 'f-table-cell',
                                         style: {
-                                            'white-space': 'nowrap'
+                                            display: 'inline-block',
+                                            width: props.store.tableColumnWidth[count],
+                                            'white-space': 'nowrap',
+                                            overflow:'hidden'
                                         }
                                     },
                                     [
@@ -66,17 +68,75 @@ export default defineComponent({
                                         cell
                                     ]
                                 )
-
                             })
-
                         ]
-
                     )
 
                 })
-
             ]
         )
+        // return h(
+        //     'div',
+        //     {
+        //         class: 'f-table-body',
+        //         style: {
+        //             display: 'flex',
+        //         }
+        //     },
+        //     [
+        //         props.store.tableColumnData.map((columnData: any) => {
+        //             count++
+
+        //             return h(
+        //                 'div',
+        //                 {
+        //                     class: 'f-table-column',
+        //                     style: {
+        //                         display: 'inline-block',
+        //                         width: props.store.tableColumnWidth[count],
+        //                         overflow:'hidden'
+        //                     }
+        //                 },
+        //                 [
+        //                     columnData.map((cell: any) => {
+
+        //                         return h(
+        //                             'div',
+        //                             {
+        //                                 class: 'f-table-cell',
+        //                                 style: {
+        //                                     'white-space': 'nowrap'
+        //                                 }
+        //                             },
+        //                             [
+        //                                 /**
+        //                                 * 渲染插槽
+        //                                 * slots:f-table-column
+        //                                 */
+        //                                 h(
+        //                                     'div',
+        //                                     {
+        //                                         style: {
+        //                                             display: 'inline-block',
+
+        //                                         }
+        //                                     },
+        //                                     props.store.tableColumnSlots[count]?.default()
+        //                                 ),
+        //                                 cell
+        //                             ]
+        //                         )
+
+        //                     })
+
+        //                 ]
+
+        //             )
+
+        //         })
+
+        //     ]
+        // )
 
         // return h('div',
         //     {

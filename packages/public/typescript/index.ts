@@ -18,14 +18,19 @@ export interface TableProps {
     data: Array<TablePropsObject>
 }
 
-export interface VueDomValue extends Element {
-    children: Array<VueDom> & VueDomChildren
-    
-}
 export interface VueDomChildren {
     namedItem: (name: string) => Element | null
     item: (index: number) => Element | null
 
+}
+
+export interface VueDomStyle {
+    width: string
+}
+
+export interface VueDomValue extends Element {
+    children: Array<VueDom> & VueDomChildren
+    style: VueDomStyle
 }
 
 export interface VueDom extends HTMLInputElement {
@@ -50,7 +55,7 @@ export interface store {
     tableColumnSlots?: Array<object>
     tableColumnProp?: Array<string>
     tableColumnWidth?: Array<string>
-    testData?: Array<TablePropsObject>
+    testData?: Array<object>
 }
 
 
@@ -153,6 +158,24 @@ export function getTableRenderData(slots: Slots, props: TableProps): store {
     // 处理渲染数据
     if (store.tableColumnProp) {
         for (const key in props.data) {
+            let tempArr: Array<any> = []
+            for (const key2 in store.tableColumnProp) {
+
+                if (props.data[key][store.tableColumnProp[key2]]) {
+                    tempArr.push(props.data[key][store.tableColumnProp[key2]])
+                } else {
+                    tempArr.push('')
+                }
+            }
+            store.testData?.push(tempArr)
+        }
+    }
+
+    console.log(store.testData);
+
+    // 处理渲染数据2
+    if (store.tableColumnProp) {
+        for (const key in props.data) {
             let tempArr: any = []
 
             for (const key2 in props.data) {
@@ -179,12 +202,58 @@ export function getTableRenderData(slots: Slots, props: TableProps): store {
 export function widthSynchronization<T extends VueDom | null>(headerDom: T, bodyDom: T): T {
 
     if (bodyDom && headerDom) {
-        for (let i = 0; i < bodyDom.children[0].children.length; i++) {
 
-            headerDom.children[0].children[i].style.width = `${bodyDom?.children[0].children[i].clientWidth}px`
+        const TABLE_FIRST_ROW_CELL = bodyDom.children[0].children[0].children // table第一行的单元格（横）
+        const TABLE_HEADER_CELL = headerDom.children[0].children // table头部的单元格
 
+        for (let i = 0; i < TABLE_FIRST_ROW_CELL.length; i++) {
+            TABLE_HEADER_CELL[i].style.width = `${TABLE_FIRST_ROW_CELL[i].clientWidth}px`
         }
     }
 
     return headerDom
+}
+
+/**
+ * 作用：当列未设置宽度时，列的宽度会被设置为该列中宽度最大的单元格的宽度
+ */
+export function columnWidthAdaptive<T extends VueDom | null>(bodyDom: T, store: store) {
+
+    if (bodyDom) {
+
+        const TABLE_BODY = bodyDom.children[0] // table主体
+
+        // 遍历出未设置宽度的列
+        for (const key in store.tableColumnWidth) {
+            const TABLE_COLUMN = TABLE_BODY.children // table的列（竖）
+            let tempWidth: number = 0
+
+            // 处理未设置宽度的列
+            if (!store.tableColumnWidth[parseInt(key)]) {
+
+                // 遍历指定列中宽度最大的单元格，并保存其宽度
+                for (let i = 0; i < TABLE_COLUMN.length; i++) {
+
+                    const TABLE_COLUMN_CELL = TABLE_BODY.children[i].children[parseInt(key)] // table列中的单元格
+
+                    if (i == 0) {
+                        tempWidth = TABLE_COLUMN_CELL.clientWidth
+
+                    } else {
+                        if (TABLE_COLUMN_CELL.clientWidth > tempWidth) {
+                            tempWidth = TABLE_COLUMN_CELL.clientWidth
+                        }
+                    }
+
+                }
+                // 将指定列的宽度和该列中宽度最大的单元格宽度进行同步
+                for (let i = 0; i < TABLE_BODY.children.length; i++) {
+                    const TABLE_COLUMN_CELL = TABLE_BODY.children[i].children[parseInt(key)] // 列的单元格
+
+                    TABLE_COLUMN_CELL.style.width = `${tempWidth}px`
+
+                }
+            }
+        }
+    }
 }
