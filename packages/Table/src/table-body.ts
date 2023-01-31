@@ -34,6 +34,7 @@ export default defineComponent({
                             style: {
                                 display: 'inline-block',
                                 width: props.store.tableColumnWidth[count],
+                                overflow:'hidden'
                             }
                         },
                         [
@@ -43,7 +44,9 @@ export default defineComponent({
                                     'div',
                                     {
                                         class: 'f-table-cell',
-
+                                        style: {
+                                            'white-space': 'nowrap'
+                                        }
                                     },
                                     [
                                         /**

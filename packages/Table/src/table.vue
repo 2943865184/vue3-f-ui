@@ -17,7 +17,7 @@
 
 </template>
 <script lang="ts" >
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, nextTick, onMounted, ref } from 'vue'
 import { store } from '../../public/typescript/index'
 import { getTableRenderData, widthSynchronization, VueDom } from '../../public/typescript/index'
 import TableColumn from './table-column'
@@ -37,8 +37,8 @@ export default defineComponent({
         const tableWrapper = ref()
         const headerWrapper = ref<VueDom | null>(null)
         const bodyWrapper = ref<VueDom | null>(null)
-        let store: store | unknown = getTableRenderData(slots, props)
 
+        let store: store | unknown = getTableRenderData(slots, props)
         let tableWidth = '100%'
 
         /**
@@ -46,14 +46,18 @@ export default defineComponent({
          */
         function initialization() {
 
-            headerWrapper.value = widthSynchronization(headerWrapper.value, bodyWrapper.value)
 
+            nextTick(() => {
+                headerWrapper.value = widthSynchronization(headerWrapper.value, bodyWrapper.value)
+            })
             /**
              * 设置table宽度
              */
             if (props.width && typeof props.width == 'string' && tableWrapper.value) {
 
                 tableWrapper.value.style.width = props.width
+                // tableWrapper.value.style.maxWidth = ''
+                
 
             }
 
