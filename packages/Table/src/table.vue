@@ -19,10 +19,11 @@
 <script lang="ts" >
 import { defineComponent, nextTick, onMounted, ref } from 'vue'
 import { store } from '../../public/typescript/index'
-import { getTableRenderData, widthSynchronization, VueDom, columnWidthAdaptive } from '../../public/typescript/index'
+import { getTableRenderData, widthSynchronization, VueDom, VueDomValue, setTableStyle } from '../../public/typescript/index'
 import TableColumn from './table-column'
 import TableHeader from './table-header'
 import TableBody from './table-body'
+
 
 
 export default defineComponent({
@@ -46,34 +47,28 @@ export default defineComponent({
          */
         function initialization() {
 
+            let tableHeader = headerWrapper.value?.children[0]
+            let tableBody = bodyWrapper.value?.children[0]
 
-
-
-
-
-            nextTick(() => {
-
-                columnWidthAdaptive(bodyWrapper.value, store)
-
-                widthSynchronization(headerWrapper.value, bodyWrapper.value)
-
-                
-            })
             /**
-             * 设置table宽度
-             */
-            if (props.width && typeof props.width == 'string' && tableWrapper.value) {
+            * 设置table样式
+            */
+            if (tableHeader && tableBody) {
+                setTableStyle(tableWrapper.value, store)
 
-                tableWrapper.value.style.width = props.width
-                // tableWrapper.value.style.maxWidth = ''
+                nextTick(() => {
 
+                    widthSynchronization(tableHeader, tableBody)
 
+                })
             }
+
 
         }
 
         onMounted(() => {
             initialization()
+
         })
 
         return {
@@ -83,7 +78,11 @@ export default defineComponent({
             bodyWrapper,
             headerWrapper,
         }
-    }
+
+    },
+
+
+
 
 
 })
@@ -91,20 +90,3 @@ export default defineComponent({
 
 
 </script>
-
-<style scoped lang="less">
-// .f-table {
-//     .headerWrapper {}
-
-//     .bodyWrapper {
-//         .f-table-body {
-//             .f-table-column {
-//                 .f-table-cell {
-//                     // background: red;
-//                 }
-//             }
-//         }
-
-//     }
-// }
-</style>

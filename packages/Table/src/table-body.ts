@@ -7,6 +7,7 @@ export default defineComponent({
         return {
             props
         }
+
     },
     /**
      * 渲染table身体
@@ -14,41 +15,31 @@ export default defineComponent({
     render() {
         let { props } = this
         let count: number
+
+        
+        
         return h(
             'div',
             {
                 class: 'f-table-body',
-                style: {
-                    display: 'block',
-                }
+                
             },
             [
-                props.store.testData.map((column: any) => {
-                    // console.log(props.store.tableColumnWidth);
+                props.store.tableColumnData.map((column: any) => {
 
                     count = -1
                     return h(
-                        'div',
+                        'tr',
                         {
-                            class: 'f-table-column',
-                            style: {
-                                display: 'flex',
-                                // overflow: 'hidden'
-                            }
+                            class: 'f-table-row',
                         },
                         [
                             column.map((cell: any) => {
                                 count++
                                 return h(
-                                    'div',
+                                    'td',
                                     {
                                         class: 'f-table-cell',
-                                        style: {
-                                            display: 'inline-block',
-                                            width: props.store.tableColumnWidth[count],
-                                            'white-space': 'nowrap',
-                                            overflow:'hidden'
-                                        }
                                     },
                                     [
                                         /**
@@ -60,7 +51,6 @@ export default defineComponent({
                                             {
                                                 style: {
                                                     display: 'inline-block',
-
                                                 }
                                             },
                                             props.store.tableColumnSlots[count]?.default()

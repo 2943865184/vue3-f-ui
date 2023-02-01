@@ -1,0 +1,20 @@
+.f-table {
+  font-size: 14px;
+}
+.f-table .f-table-header,
+.f-table .f-table-row {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+  min-height: 40px;
+  line-height: 40px;
+}
+.f-table .f-table-header {
+  color: #909399;
+}
+.f-table .f-table-row {
+  color: #606266;
+}
+.f-table .f-table-cell {
+  margin: 0 10px;
+}

@@ -9,8 +9,5 @@ export default defineComponent({
     props: ['prop', 'label', 'width'],
     setup(props) {
 
-        
     }
-
-
 })

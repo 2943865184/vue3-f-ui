@@ -16,6 +16,7 @@ export interface TablePropsObject {
 
 export interface TableProps {
     data: Array<TablePropsObject>
+    width: string | undefined
 }
 
 export interface VueDomChildren {
@@ -24,13 +25,9 @@ export interface VueDomChildren {
 
 }
 
-export interface VueDomStyle {
-    width: string
-}
-
 export interface VueDomValue extends Element {
     children: Array<VueDom> & VueDomChildren
-    style: VueDomStyle
+    style: CSSStyleDeclaration
 }
 
 export interface VueDom extends HTMLInputElement {
@@ -39,23 +36,13 @@ export interface VueDom extends HTMLInputElement {
 
 }
 
-
-
-
-interface columnData {
-    title: string
-    data: Array<string | number | boolean>,
-    children: []
-}
-
-
 export interface store {
-    tableColumnName?: Array<string>
-    tableColumnData?: Array<object>
-    tableColumnSlots?: Array<object>
-    tableColumnProp?: Array<string>
-    tableColumnWidth?: Array<string>
-    testData?: Array<object>
+    tableColumnName: Array<string>
+    tableColumnData: Array<object>
+    tableColumnSlots: Array<object>
+    tableColumnProp: Array<string>
+    tableColumnWidth: Array<string>
+    tableWidth: string | undefined
 }
 
 
@@ -115,14 +102,15 @@ export function sizeJudge(props: buttonProps): sizeClass {
  */
 export function getTableRenderData(slots: Slots, props: TableProps): store {
     let store: store = {
-        tableColumnName: [],      // 列名
+        tableColumnName: [],  // 列名
         tableColumnData: [],  // 表格渲染数据
         tableColumnSlots: [], // 表格列插槽
         tableColumnProp: [],  // 表格列传入的数据
-        tableColumnWidth: [],  // 表格列宽度
-        testData: []
+        tableColumnWidth: [], // 表格列宽度
+        tableWidth: ''
     }
-
+    // table宽度
+    store.tableWidth = props.width
 
     if (slots?.default) {
         slots.default().find((item: any) => {
@@ -167,29 +155,28 @@ export function getTableRenderData(slots: Slots, props: TableProps): store {
                     tempArr.push('')
                 }
             }
-            store.testData?.push(tempArr)
-        }
-    }
-
-    console.log(store.testData);
-
-    // 处理渲染数据2
-    if (store.tableColumnProp) {
-        for (const key in props.data) {
-            let tempArr: any = []
-
-            for (const key2 in props.data) {
-
-                if (props.data[key2][store.tableColumnProp[key]]) {
-                    tempArr.push(props.data[key2][store.tableColumnProp[key]])
-                } else {
-                    tempArr.push('')
-                }
-
-            }
             store.tableColumnData?.push(tempArr)
         }
     }
+
+
+    // // 处理渲染数据2
+    // if (store.tableColumnProp) {
+    //     for (const key in props.data) {
+    //         let tempArr: any = []
+
+    //         for (const key2 in props.data) {
+
+    //             if (props.data[key2][store.tableColumnProp[key]]) {
+    //                 tempArr.push(props.data[key2][store.tableColumnProp[key]])
+    //             } else {
+    //                 tempArr.push('')
+    //             }
+
+    //         }
+    //         store.tableColumnData?.push(tempArr)
+    //     }
+    // }
 
     return store
 
@@ -199,15 +186,15 @@ export function getTableRenderData(slots: Slots, props: TableProps): store {
  * @param bodyDom 
  * @param headerDom 
  */
-export function widthSynchronization<T extends VueDom | null>(headerDom: T, bodyDom: T): T {
+export function widthSynchronization<T extends VueDomValue | undefined>(headerDom: T, bodyDom: T): T {
 
     if (bodyDom && headerDom) {
 
-        const TABLE_FIRST_ROW_CELL = bodyDom.children[0].children[0].children // table第一行的单元格（横）
-        const TABLE_HEADER_CELL = headerDom.children[0].children // table头部的单元格
+        let tableHeaderCell = headerDom.children // table头部的单元格
+        let tableFirstRowCell = bodyDom.children[0].children // table第一行的单元格（横）
 
-        for (let i = 0; i < TABLE_FIRST_ROW_CELL.length; i++) {
-            TABLE_HEADER_CELL[i].style.width = `${TABLE_FIRST_ROW_CELL[i].clientWidth}px`
+        for (let i = 0; i < tableFirstRowCell.length; i++) {
+            tableHeaderCell[i].style.width = `${tableFirstRowCell[i].scrollWidth}px`
         }
     }
 
@@ -217,43 +204,78 @@ export function widthSynchronization<T extends VueDom | null>(headerDom: T, body
 /**
  * 作用：当列未设置宽度时，列的宽度会被设置为该列中宽度最大的单元格的宽度
  */
-export function columnWidthAdaptive<T extends VueDom | null>(bodyDom: T, store: store) {
+// export function columnWidthAdaptive<T extends VueDom | null>(bodyDom: T, store: store) {
 
-    if (bodyDom) {
+//     if (bodyDom) {
 
-        const TABLE_BODY = bodyDom.children[0] // table主体
+//         const TABLE_BODY = bodyDom.children[0] // table主体
 
-        // 遍历出未设置宽度的列
-        for (const key in store.tableColumnWidth) {
-            const TABLE_COLUMN = TABLE_BODY.children // table的列（竖）
-            let tempWidth: number = 0
+//         // 遍历出未设置宽度的列
+//         for (const key in store.tableColumnWidth) {
+//             const TABLE_COLUMN = TABLE_BODY.children // table的列（竖）
+//             let tempWidth: number = 0
 
-            // 处理未设置宽度的列
-            if (!store.tableColumnWidth[parseInt(key)]) {
+//             // 处理未设置宽度的列
+//             if (!store.tableColumnWidth[parseInt(key)]) {
 
-                // 遍历指定列中宽度最大的单元格，并保存其宽度
-                for (let i = 0; i < TABLE_COLUMN.length; i++) {
+//                 // 遍历指定列中宽度最大的单元格，并保存其宽度
+//                 for (let i = 0; i < TABLE_COLUMN.length; i++) {
 
-                    const TABLE_COLUMN_CELL = TABLE_BODY.children[i].children[parseInt(key)] // table列中的单元格
+//                     const TABLE_COLUMN_CELL = TABLE_BODY.children[i].children[parseInt(key)] // table列中的单元格
 
-                    if (i == 0) {
-                        tempWidth = TABLE_COLUMN_CELL.clientWidth
+//                     if (i == 0) {
+//                         tempWidth = TABLE_COLUMN_CELL.clientWidth
 
-                    } else {
-                        if (TABLE_COLUMN_CELL.clientWidth > tempWidth) {
-                            tempWidth = TABLE_COLUMN_CELL.clientWidth
-                        }
-                    }
+//                     } else {
+//                         if (TABLE_COLUMN_CELL.clientWidth > tempWidth) {
+//                             tempWidth = TABLE_COLUMN_CELL.clientWidth
+//                         }
+//                     }
 
-                }
-                // 将指定列的宽度和该列中宽度最大的单元格宽度进行同步
-                for (let i = 0; i < TABLE_BODY.children.length; i++) {
-                    const TABLE_COLUMN_CELL = TABLE_BODY.children[i].children[parseInt(key)] // 列的单元格
+//                 }
+//                 // 将指定列的宽度和该列中宽度最大的单元格宽度进行同步
+//                 for (let i = 0; i < TABLE_BODY.children.length; i++) {
+//                     const TABLE_COLUMN_CELL = TABLE_BODY.children[i].children[parseInt(key)] // 列的单元格
 
-                    TABLE_COLUMN_CELL.style.width = `${tempWidth}px`
+//                     TABLE_COLUMN_CELL.style.width = `${tempWidth}px`
 
-                }
-            }
-        }
+//                 }
+//             }
+//         }
+//     }
+// }
+
+/**
+ * 设置table样式
+ * 
+ */
+export function setTableStyle<T extends VueDomValue>(tableWrapper: T, store: store) {
+
+
+    let tableHeader = tableWrapper.children[0].children
+    let tableBody = tableWrapper.children[1].children[0].children
+    /**
+     * 设置table宽度
+     */
+    if (tableWrapper && store.tableWidth) {
+        tableWrapper.style.width = store.tableWidth
     }
+
+    /**
+     * 设置table列宽度
+     */
+    for (let index = 0; index < tableBody.length; index++) {
+        let tableRow = tableBody[index].children
+    
+        for (let index2 = 0; index2 < tableRow.length; index2++) {
+            let tableCell = tableRow[index2]
+
+            tableCell.style.width = store.tableColumnWidth[index2]
+            
+        }
+
+    }
+
+
+
 }

@@ -1,15 +1,10 @@
-import { defineComponent, h, onMounted ,ref} from 'vue'
+import { defineComponent, h, onMounted, ref } from 'vue'
 
 export default defineComponent({
     name: 'f-table-header',
     props: ['store'],
     setup(props) {
 
-        onMounted(() => {
-          
-            
-            
-        })
         return {
             props
         }
@@ -18,31 +13,19 @@ export default defineComponent({
      * 渲染table头部
      */
     render() {
-        let count: number = 0
         return h(
-            'div',
-            {
-                class: 'f-table-header',
-
-                style: {
-                    display: 'flex',
-                    fontWeight: '700',
-                    background: '#eee',
-                    width: '100%'
-                }
+            'tr',
+            { 
+                class: 'f-table-header' 
             },
             [
-                this.props.store.tableColumnName.map((item: any) => {
+                this.props.store.tableColumnName.map((cell: any) => {
                     return h(
-                        'div',
+                        'th',
                         {
-                            style: {
-
-                                display: 'inline-block',
-
-                            }
+                            class: 'f-table-cell'
                         },
-                        item
+                        cell
                     )
                 })
             ]
