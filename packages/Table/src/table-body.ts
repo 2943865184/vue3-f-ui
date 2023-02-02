@@ -16,13 +16,13 @@ export default defineComponent({
         let { props } = this
         let count: number
 
-        
-        
+
+
         return h(
             'div',
             {
                 class: 'f-table-body',
-                
+
             },
             [
                 props.store.tableColumnData.map((column: any) => {
@@ -42,20 +42,30 @@ export default defineComponent({
                                         class: 'f-table-cell',
                                     },
                                     [
-                                        /**
-                                        * 渲染插槽
-                                        * slots:f-table-column
-                                        */
                                         h(
                                             'div',
                                             {
-                                                style: {
-                                                    display: 'inline-block',
-                                                }
+                                                class: 'cell'
                                             },
-                                            props.store.tableColumnSlots[count]?.default()
-                                        ),
-                                        cell
+                                            [
+                                                /**
+                                                 * 渲染插槽
+                                                 * slots:f-table-column
+                                                 */
+                                                h(
+                                                    'div',
+                                                    {
+                                                        calss: 'slots',
+                                                        style: {
+                                                            display: 'inline-block'
+                                                        }
+                                                    },
+                                                    props.store.tableColumnSlots[count]?.default()
+                                                ),
+                                                
+                                                cell
+                                            ]
+                                        )
                                     ]
                                 )
                             })

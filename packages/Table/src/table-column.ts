@@ -6,7 +6,7 @@ import { underlineClass } from '../../public/typescript/index'
 
 export default defineComponent({
     name: 'f-table-column',
-    props: ['prop', 'label', 'width'],
+    props: ['prop', 'label', 'width','fixed'],
     setup(props) {
 
     }

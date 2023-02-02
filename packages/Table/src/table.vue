@@ -1,16 +1,25 @@
 <template>
     <div class="f-table" ref="tableWrapper">
-        <!-- 头部 -->
-        <div class="headerWrapper" ref="headerWrapper">
-            <TableHeader :store="store" ref="tableHeader" />
-        </div>
-        <!-- 身体 -->
-        <div class="bodyWrapper" ref="bodyWrapper">
-            <TableBody :store="store" />
+
+        <div class="table-inner-wrapper" ref="innerWrapper">
+            <!-- 头部 -->
+            <div class="header-wrapper" ref="headerWrapper">
+                <TableHeader :store="store" />
+            </div>
+
+            <!-- 身体 -->
+            <div class="body-wrapper" ref="bodyWrapper">
+                <TableBody :store="store" />
+            </div>
+
+            <!-- 底部 -->
+            <div class="foot-wrapper">
+                <div class="dragBar" v-if="store.tableFixedColumnInfo.length > 0">123</div>
+            </div>
         </div>
 
-        <!-- 底部 -->
-        <div class="footWrapper"></div>
+
+
 
     </div>
 
@@ -18,16 +27,14 @@
 </template>
 <script lang="ts" >
 import { defineComponent, nextTick, onMounted, ref } from 'vue'
-import { store } from '../../public/typescript/index'
-import { getTableRenderData, widthSynchronization, VueDom, VueDomValue, setTableStyle } from '../../public/typescript/index'
+import { getTableRenderData, widthSynchronization, VueDom, setTableStyle, store } from './index'
 import TableColumn from './table-column'
 import TableHeader from './table-header'
 import TableBody from './table-body'
 
 
-
 export default defineComponent({
-    props: ['data', 'width'],
+    props: ['data', 'width', 'isHeader'],
     components: {
         TableColumn,
         TableHeader,
@@ -35,12 +42,12 @@ export default defineComponent({
     },
 
     setup(props, { slots }) {
-        const tableWrapper = ref()
+        const tableWrapper = ref<VueDom | null>(null)
+        const innerWrapper = ref<VueDom | null>(null)
         const headerWrapper = ref<VueDom | null>(null)
         const bodyWrapper = ref<VueDom | null>(null)
 
         let store: store = getTableRenderData(slots, props)
-        let tableWidth = '100%'
 
         /**
          * 初始化方法
@@ -63,7 +70,6 @@ export default defineComponent({
                 })
             }
 
-
         }
 
         onMounted(() => {
@@ -73,7 +79,6 @@ export default defineComponent({
 
         return {
             store,
-            tableWidth,
             tableWrapper,
             bodyWrapper,
             headerWrapper,

@@ -4,22 +4,62 @@
     .f-table-header,
     .f-table-row {
         display: flex;
-        border-bottom: 1px solid #ddd;
         text-align: left;
         min-height: 40px;
-        line-height: 40px;
+        border-bottom: 1px solid #ddd;
     }
 
     .f-table-header {
         color: #909399;
     }
 
-    .f-table-row {
+    .f-table-body {
         color: #606266;
+
     }
 
     .f-table-cell {
-        margin: 0 10px;
+
+        display: inline-block;
+        padding: 10px 0;
+
+        .cell {
+
+            padding: 0 10px;
+            word-break: break-all;
+
+        }
+
     }
+
+}
+
+.f-table-fixed {
+    .table-inner-wrapper {
+        // white-space: nowrap;
+
+        .header-wrapper ,
+        .body-wrapper {
+            white-space: nowrap;
+            position: relative;
+            width: 100%;
+        }
+
+        
+
+        .f-table-header,
+        .f-table-row {
+            display: block;
+            white-space: nowrap;
+
+        }
+
+        .f-table-cell-fixed {
+            // position: absolute;
+            right: 0;
+        }
+
+    }
+    overflow: auto;
 
 }

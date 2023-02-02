@@ -13,22 +13,34 @@ export default defineComponent({
      * 渲染table头部
      */
     render() {
-        return h(
-            'tr',
-            { 
-                class: 'f-table-header' 
-            },
-            [
-                this.props.store.tableColumnName.map((cell: any) => {
-                    return h(
-                        'th',
-                        {
-                            class: 'f-table-cell'
-                        },
-                        cell
-                    )
-                })
-            ]
-        )
+        let { props } = this
+        if (props.store.tableIsHeader == undefined || props.store.tableIsHeader == false) {
+            return h(
+                'tr',
+                {
+                    class: 'f-table-header'
+                },
+                [
+                    this.props.store.tableColumnName.map((cell: any) => {
+                        return h(
+                            'th',
+                            {
+                                class: 'f-table-cell'
+                            },
+                            [
+                                h(
+                                    'div',
+                                    {
+                                        class: 'cell'
+                                    },
+                                    cell
+
+                                )
+                            ]
+                        )
+                    })
+                ]
+            )
+        }
     }
 })
