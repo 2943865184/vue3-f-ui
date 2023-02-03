@@ -36,6 +36,8 @@ export default defineComponent({
                         [
                             column.map((cell: any) => {
                                 count++
+                                console.log(cell);
+                                
                                 return h(
                                     'td',
                                     {
@@ -72,7 +74,11 @@ export default defineComponent({
                         ]
                     )
 
-                })
+                }),
+                // h(
+                //     'div',
+                //     '测试'
+                // )
             ]
         )
         // return h(

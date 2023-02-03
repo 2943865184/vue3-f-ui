@@ -1,5 +1,6 @@
 .f-table {
     font-size: 14px;
+    position: relative;
 
     .f-table-header,
     .f-table-row {
@@ -35,17 +36,19 @@
 }
 
 .f-table-fixed {
-    .table-inner-wrapper {
-        // white-space: nowrap;
+    position: relative;
 
-        .header-wrapper ,
+    .table-inner-wrapper {
+
+        .header-wrapper,
         .body-wrapper {
             white-space: nowrap;
-            position: relative;
-            width: 100%;
+            // position: relative;
+            // width: 100%;
         }
 
-        
+        // .foot-wrapper {
+        // }
 
         .f-table-header,
         .f-table-row {
@@ -55,11 +58,29 @@
         }
 
         .f-table-cell-fixed {
-            // position: absolute;
-            right: 0;
+            background: #fff;
+            z-index: 99;
+            // position:absolute;
+            left: 0;
         }
 
     }
-    overflow: auto;
+
+    .slider-bar {
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.05);
+        height: 8px;
+
+        div {
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.1);
+            height: 100%;
+            width: 100px;
+        }
+    }
+
+    overflow: hidden;
+
+   
 
 }

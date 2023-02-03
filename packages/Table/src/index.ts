@@ -37,6 +37,7 @@ export interface tableFixedColumnInfo {
 export interface store {
     tableColumnName: Array<string>
     tableColumnData: Array<object>
+    tableFixedColumnData: Array<object>
     tableColumnSlots: Array<object>
     tableColumnProp: Array<string>
     tableColumnWidth: Array<string>
@@ -53,6 +54,7 @@ export function getTableRenderData(slots: Slots, props: TableProps): store {
     let store: store = {
         tableColumnName: [],  // 列名
         tableColumnData: [],  // 表格渲染数据
+        tableFixedColumnData: [], // 固定列数据
         tableColumnSlots: [], // 表格列插槽
         tableColumnProp: [],  // 表格列传入的数据
         tableColumnWidth: [], // 表格列宽度
@@ -115,6 +117,7 @@ export function getTableRenderData(slots: Slots, props: TableProps): store {
 
     // 处理渲染数据
     if (store.tableColumnProp) {
+
         for (const key in props.data) {
             let tempArr: Array<any> = []
             for (const key2 in store.tableColumnProp) {
@@ -213,13 +216,11 @@ export function setTableStyle<T extends VueDom | null>(tableWrapper: T, store: s
         }
 
         /**
-          * 设置table宽度
-          */
+         * 设置table宽度
+         */
         if (store.tableWidth) {
             // tableWrapper.setAttribute('width', store.tableWidth) // 无效？？？
             tableWrapper.style.width = store.tableWidth
-
-
         }
 
         /**
@@ -276,4 +277,82 @@ export function setTableStyle<T extends VueDom | null>(tableWrapper: T, store: s
         tableInnerWrapper.style.width = `${tableColumnWidthSum}px`
     }
 
+}
+/**
+ * 滑动条移动逻辑
+ */
+export function sliderBarHandle<T extends VueDom | null>(sliderBarDom: T, tableWrapper: T) {
+
+    if (sliderBarDom && tableWrapper) {
+
+        let tableInnerWrapper = tableWrapper.children[0]
+
+        let frameWidth = tableWrapper?.clientWidth                  // 边框宽度
+        let contentWidth = tableWrapper?.children[0].clientWidth    // 内容宽度
+
+        if (frameWidth < contentWidth) {
+            let sliderBarWidth = frameWidth - (contentWidth - frameWidth) // 滚动条宽度 = 边框宽度 - (内容宽度 - 边框宽度) 
+
+            let sliderBarMaxMoveDistance = frameWidth - sliderBarWidth // 滚动条最大移动距离 = 边框宽度 - 滚动条宽度
+
+            sliderBarDom.children[0].style.width = `${sliderBarWidth}px`
+
+            let mousedownX: number = 0            // 滚动条所处的位置 = 鼠标按下时的x坐标 + 滚动条移动的距离
+            let move: number = 0                  // 鼠标移动距离 = 滚动条所处的位置 - 鼠标当前x坐标
+            let sliderBarMoveDistance: number = 0 // 滚动条移动的距离（默认为0） 
+            /**
+             * 滑动条鼠标按下移动事件回调函数
+             */
+            const sliderBarMousemove = (event: any) => {
+
+                move = mousedownX - event.clientX   // 鼠标移动距离
+
+                move = -move
+
+                if (move < 0) {
+                    sliderBarDom.children[0].style.transform = `translateX(0px)`
+                    tableInnerWrapper.style.transform = `translateX(0px)`
+                }
+
+                if (move > sliderBarMaxMoveDistance) {
+                    sliderBarDom.children[0].style.transform = `translateX(${sliderBarMaxMoveDistance}px)`
+                    tableInnerWrapper.style.transform = `translateX(${-sliderBarMaxMoveDistance}px)`
+                }
+
+                if (move > 0 && move < sliderBarMaxMoveDistance) {
+                    sliderBarDom.children[0].style.transform = `translateX(${move}px)`
+                    tableInnerWrapper.style.transform = `translateX(${-move}px)`
+                }
+
+            }
+            // 鼠标按下滚动条事件
+            sliderBarDom.children[0].addEventListener('mousedown', (event) => {
+
+                mousedownX = event.clientX - sliderBarMoveDistance
+                window.onselectstart = function () { return false } // 在移动滚动条时禁止选择文本
+
+                window.addEventListener('mousemove', sliderBarMousemove)
+            })
+            // 鼠标抬起事件
+            addEventListener('mouseup', () => {
+
+                window.onselectstart = function () { return true } // 取消在移动滚动条时禁止选择文本
+
+                // 记录滚动条移动距离
+
+                if (move < 0) {
+                    sliderBarMoveDistance = 0
+                } else if (move > sliderBarMaxMoveDistance) {
+                    sliderBarMoveDistance = sliderBarMaxMoveDistance
+                } else {
+                    sliderBarMoveDistance = move
+                }
+
+                removeEventListener('mousemove', sliderBarMousemove) // 删除监听鼠标移动事件
+
+            })
+        }
+
+
+    }
 }
