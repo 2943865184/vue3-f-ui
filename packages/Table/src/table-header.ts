@@ -16,31 +16,38 @@ export default defineComponent({
         let { props } = this
         if (props.store.tableIsHeader == undefined || props.store.tableIsHeader == false) {
             return h(
-                'tr',
+                'div',
                 {
                     class: 'f-table-header'
                 },
-                [
-                    this.props.store.tableColumnName.map((cell: any) => {
-                        return h(
-                            'th',
-                            {
-                                class: 'f-table-cell'
-                            },
-                            [
-                                h(
-                                    'div',
-                                    {
-                                        class: 'cell'
-                                    },
-                                    cell
+                h(
+                    'tr',
+                    {
+                        class: 'f-table-row'
+                    },
+                    [
+                        this.props.store.tableColumnName.map((cell: any) => {
+                            return h(
+                                'th',
+                                {
+                                    class: 'f-table-cell'
+                                },
+                                [
+                                    h(
+                                        'div',
+                                        {
+                                            class: 'cell'
+                                        },
+                                        cell
 
-                                )
-                            ]
-                        )
-                    })
-                ]
+                                    )
+                                ]
+                            )
+                        })
+                    ]
+                )
             )
+
         }
     }
 })

@@ -16,8 +16,6 @@ export default defineComponent({
         let { props } = this
         let count: number
 
-
-
         return h(
             'div',
             {

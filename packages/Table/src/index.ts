@@ -1,5 +1,5 @@
-import { Slots } from 'vue'
-
+import { Slots, watch, ref } from 'vue'
+import table from './table.vue'
 export interface TablePropsObject {
     [key: string]: string
 }
@@ -11,6 +11,7 @@ export interface TableProps {
 }
 
 export interface VueDomChildren {
+
     namedItem: (name: string) => Element | null
     item: (index: number) => Element | null
 
@@ -21,10 +22,12 @@ export interface VueDomChildren {
 //     style: CSSStyleDeclaration
 // }
 
-export interface VueDom extends HTMLInputElement, VueDomChildren {
-    value: string & VueDom
+export interface VueDom extends HTMLInputElement {
+    // value: string & VueDom
     children: Array<VueDom> & VueDomChildren
 
+    namedItem: (name: string) => Element | null
+    item: (index: number) => Element | null
 }
 
 export type VueDomArray = Array<VueDom>
@@ -35,6 +38,8 @@ export interface tableFixedColumnInfo {
 }
 
 export interface store {
+    tableColumn: Array<VueDom>
+    tableRow: Array<VueDom>
     tableColumnName: Array<string>
     tableColumnData: Array<object>
     tableFixedColumnData: Array<object>
@@ -46,12 +51,76 @@ export interface store {
     tableIsHeader: boolean | undefined
 }
 
+export interface TableDomStore {
+    tableInnerWrapper: VueDom | undefined
+    tableHeaderWrapper: VueDom | undefined
+    tableBodyWrapper: VueDom | undefined
+    tableHeaderRows: VueDom[] | undefined
+    tableBodyRows: VueDom[] | undefined
+    tableHeaderColumn: Array<VueDom[]> | undefined
+    tableBodyColumn: Array<VueDom[]> | undefined
+}
+
+/**
+ * 获取table列数据
+ */
+export function getColumn<T extends VueDom | undefined>(dom: T): Array<VueDom[]> {
+    const ROW_LENGTH = dom?.children.length
+    let arrayDom: Array<VueDom[]> = []
+
+    if (ROW_LENGTH) {
+        const COLUMN_LENGTH = dom.children[0].children.length
+
+        for (let index = 0; index < COLUMN_LENGTH; index++) {
+            let tempArr = []
+
+            for (let index2 = 0; index2 < ROW_LENGTH; index2++) {
+
+                tempArr.push(dom.children[index2].children[index])
+            }
+            arrayDom.push(tempArr)
+
+        }
+    }
+    return arrayDom
+
+}
+/**
+ * tableDom库
+ * 存储了table的各种节点Dom
+ */
+export function getTableDomStore<T extends VueDom | null>(table: T): TableDomStore {
+    const tableInnerWrapper = table?.children[0]                // table内部封装
+    const tableHeaderWrapper = tableInnerWrapper?.children[0]   // tableHeader封装
+    const tableBodyWrapper = tableInnerWrapper?.children[1]     // tableBody封装
+    const tableHeader = tableHeaderWrapper?.children[0]         // tableHeader
+    const tableBody = tableBodyWrapper?.children[0]             // tableBody
+    const tableHeaderRows = tableHeader?.children               // tableHeader行
+    const tableBodyRows = tableBody?.children                   // tableBody行
+    const tableHeaderColumn = getColumn(tableHeader)            // tableHeader列
+    const tableBodyColumn = getColumn(tableBody)                // tableBody列
+
+    return {
+        tableInnerWrapper,
+        tableHeaderWrapper,
+        tableBodyWrapper,
+        tableHeaderRows,
+        tableBodyRows,
+        tableHeaderColumn,
+        tableBodyColumn
+    }
+
+}
+
+
 /**
  * table组件数据处理
  * @return store 处理完毕后的数据存放对象
  */
-export function getTableRenderData(slots: Slots, props: TableProps): store {
-    let store: store = {
+export function getStore(slots: Slots, props: TableProps): store {
+    const store: store = {
+        tableColumn: [],
+        tableRow: [],
         tableColumnName: [],  // 列名
         tableColumnData: [],  // 表格渲染数据
         tableFixedColumnData: [], // 固定列数据
@@ -62,6 +131,7 @@ export function getTableRenderData(slots: Slots, props: TableProps): store {
         tableWidth: '',         // 表宽度
         tableIsHeader: false  // 是否显示表头
     }
+
     // table宽度
     store.tableWidth = props.width
 
@@ -163,7 +233,7 @@ export function widthSynchronization<T extends VueDom | undefined>(headerDom: T,
 
     if (bodyDom && headerDom) {
 
-        let tableHeaderCell = headerDom.children // table头部的单元格
+        let tableHeaderCell = headerDom.children[0].children // table头部的单元格
         let tableFirstRowCell = bodyDom.children[0].children // table第一行的单元格（横）
 
         for (let i = 0; i < tableFirstRowCell.length; i++) {
@@ -184,11 +254,12 @@ export function setTableStyle<T extends VueDom | null>(tableWrapper: T, store: s
 
         let tableInnerWrapper = tableWrapper.children[0]
 
-        let tableHeader = tableWrapper.children[0].children[0].children[0]
+        let tableHeader = tableWrapper.children[0].children[0].children[0].children[0]
         let tableBody = tableWrapper.children[0].children[1].children[0]
 
         let tableRow: Array<VueDom> = []
         let tableColumn: Array<VueDomArray> = []
+
         let tableColumnWidthSum: number = 0
 
         /**
@@ -221,6 +292,7 @@ export function setTableStyle<T extends VueDom | null>(tableWrapper: T, store: s
         if (store.tableWidth) {
             // tableWrapper.setAttribute('width', store.tableWidth) // 无效？？？
             tableWrapper.style.width = store.tableWidth
+
         }
 
         /**
@@ -249,10 +321,17 @@ export function setTableStyle<T extends VueDom | null>(tableWrapper: T, store: s
 
                     tableWrapper.setAttribute('class', 'f-table f-table-fixed')
                     store.tableFixedColumnInfo.find((item: tableFixedColumnInfo) => {
-
                         if (parseInt(key) == item.columnIndex) {
-                            tableColumnCell.setAttribute('class', 'f-table-cell f-table-cell-fixed')
-                            tableHeaderCell.setAttribute('class', 'f-table-cell f-table-cell-fixed')
+
+                            if (item.direction == 'right') {
+                                tableColumnCell.setAttribute('class', 'f-table-cell f-table-cell-fixed-right')
+                                tableHeaderCell.setAttribute('class', 'f-table-cell f-table-cell-fixed-right')
+                            }
+
+                            if (item.direction == 'left') {
+                                tableColumnCell.setAttribute('class', 'f-table-cell f-table-cell-fixed-left')
+                                tableHeaderCell.setAttribute('class', 'f-table-cell f-table-cell-fixed-left')
+                            }
                         }
 
                     })
@@ -277,82 +356,4 @@ export function setTableStyle<T extends VueDom | null>(tableWrapper: T, store: s
         tableInnerWrapper.style.width = `${tableColumnWidthSum}px`
     }
 
-}
-/**
- * 滑动条移动逻辑
- */
-export function sliderBarHandle<T extends VueDom | null>(sliderBarDom: T, tableWrapper: T) {
-
-    if (sliderBarDom && tableWrapper) {
-
-        let tableInnerWrapper = tableWrapper.children[0]
-
-        let frameWidth = tableWrapper?.clientWidth                  // 边框宽度
-        let contentWidth = tableWrapper?.children[0].clientWidth    // 内容宽度
-
-        if (frameWidth < contentWidth) {
-            let sliderBarWidth = frameWidth - (contentWidth - frameWidth) // 滚动条宽度 = 边框宽度 - (内容宽度 - 边框宽度) 
-
-            let sliderBarMaxMoveDistance = frameWidth - sliderBarWidth // 滚动条最大移动距离 = 边框宽度 - 滚动条宽度
-
-            sliderBarDom.children[0].style.width = `${sliderBarWidth}px`
-
-            let mousedownX: number = 0            // 滚动条所处的位置 = 鼠标按下时的x坐标 + 滚动条移动的距离
-            let move: number = 0                  // 鼠标移动距离 = 滚动条所处的位置 - 鼠标当前x坐标
-            let sliderBarMoveDistance: number = 0 // 滚动条移动的距离（默认为0） 
-            /**
-             * 滑动条鼠标按下移动事件回调函数
-             */
-            const sliderBarMousemove = (event: any) => {
-
-                move = mousedownX - event.clientX   // 鼠标移动距离
-
-                move = -move
-
-                if (move < 0) {
-                    sliderBarDom.children[0].style.transform = `translateX(0px)`
-                    tableInnerWrapper.style.transform = `translateX(0px)`
-                }
-
-                if (move > sliderBarMaxMoveDistance) {
-                    sliderBarDom.children[0].style.transform = `translateX(${sliderBarMaxMoveDistance}px)`
-                    tableInnerWrapper.style.transform = `translateX(${-sliderBarMaxMoveDistance}px)`
-                }
-
-                if (move > 0 && move < sliderBarMaxMoveDistance) {
-                    sliderBarDom.children[0].style.transform = `translateX(${move}px)`
-                    tableInnerWrapper.style.transform = `translateX(${-move}px)`
-                }
-
-            }
-            // 鼠标按下滚动条事件
-            sliderBarDom.children[0].addEventListener('mousedown', (event) => {
-
-                mousedownX = event.clientX - sliderBarMoveDistance
-                window.onselectstart = function () { return false } // 在移动滚动条时禁止选择文本
-
-                window.addEventListener('mousemove', sliderBarMousemove)
-            })
-            // 鼠标抬起事件
-            addEventListener('mouseup', () => {
-
-                window.onselectstart = function () { return true } // 取消在移动滚动条时禁止选择文本
-
-                // 记录滚动条移动距离
-
-                if (move < 0) {
-                    sliderBarMoveDistance = 0
-                } else if (move > sliderBarMaxMoveDistance) {
-                    sliderBarMoveDistance = sliderBarMaxMoveDistance
-                } else {
-                    sliderBarMoveDistance = move
-                }
-
-                removeEventListener('mousemove', sliderBarMousemove) // 删除监听鼠标移动事件
-
-            })
-        }
-
-
-    }
 }

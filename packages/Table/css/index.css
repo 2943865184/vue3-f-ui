@@ -1,6 +1,5 @@
 .f-table {
   font-size: 14px;
-  position: relative;
 }
 .f-table .f-table-header,
 .f-table .f-table-row {
@@ -24,29 +23,44 @@
   word-break: break-all;
 }
 .f-table-fixed {
-  position: relative;
   overflow: hidden;
+}
+.f-table-fixed .table-inner-wrapper {
+  border-spacing: 0;
+  position: relative;
+  box-sizing: content-box;
+  border-collapse: separate;
+  table-layout: fixed;
 }
 .f-table-fixed .table-inner-wrapper .header-wrapper,
 .f-table-fixed .table-inner-wrapper .body-wrapper {
-  white-space: nowrap;
+  border: 0;
 }
 .f-table-fixed .table-inner-wrapper .f-table-header,
 .f-table-fixed .table-inner-wrapper .f-table-row {
+  box-sizing: content-box;
   display: block;
   white-space: nowrap;
 }
-.f-table-fixed .table-inner-wrapper .f-table-cell-fixed {
+.f-table-fixed .table-inner-wrapper .f-table-cell-fixed-left,
+.f-table-fixed .table-inner-wrapper .f-table-cell-fixed-right {
+  box-sizing: border-box;
+  position: sticky;
   background: #fff;
-  z-index: 99;
+  z-index: 1;
+}
+.f-table-fixed .table-inner-wrapper .f-table-cell-fixed-left {
   left: 0;
 }
-.f-table-fixed .slider-bar {
+.f-table-fixed .table-inner-wrapper .f-table-cell-fixed-right {
+  right: 0;
+}
+.slider-bar {
   border-radius: 5px;
   background: rgba(0, 0, 0, 0.05);
   height: 8px;
 }
-.f-table-fixed .slider-bar div {
+.slider-bar div {
   border-radius: 5px;
   background: rgba(0, 0, 0, 0.1);
   height: 100%;

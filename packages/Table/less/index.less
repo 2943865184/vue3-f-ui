@@ -1,6 +1,5 @@
 .f-table {
     font-size: 14px;
-    position: relative;
 
     .f-table-header,
     .f-table-row {
@@ -36,51 +35,60 @@
 }
 
 .f-table-fixed {
-    position: relative;
+    overflow: hidden;
 
     .table-inner-wrapper {
+        border-spacing: 0;
+        position: relative;
+        box-sizing: content-box;
+        border-collapse: separate;
+        table-layout: fixed;
 
         .header-wrapper,
         .body-wrapper {
-            white-space: nowrap;
-            // position: relative;
-            // width: 100%;
+            border: 0;
         }
-
-        // .foot-wrapper {
-        // }
 
         .f-table-header,
         .f-table-row {
+            box-sizing: content-box;
             display: block;
             white-space: nowrap;
 
         }
 
-        .f-table-cell-fixed {
+        .f-table-cell-fixed-left,
+        .f-table-cell-fixed-right {
+            box-sizing: border-box;
+            position: sticky;
             background: #fff;
-            z-index: 99;
-            // position:absolute;
+            z-index: 1;
+        }
+
+        .f-table-cell-fixed-left {
             left: 0;
         }
 
-    }
+        .f-table-cell-fixed-right {
 
-    .slider-bar {
-        border-radius: 5px;
-        background: rgba(0, 0, 0, 0.05);
-        height: 8px;
-
-        div {
-            border-radius: 5px;
-            background: rgba(0, 0, 0, 0.1);
-            height: 100%;
-            width: 100px;
+            right: 0;
         }
+
+
+
     }
 
-    overflow: hidden;
+}
 
-   
+.slider-bar {
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.05);
+    height: 8px;
 
+    div {
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.1);
+        height: 100%;
+        width: 100px;
+    }
 }
