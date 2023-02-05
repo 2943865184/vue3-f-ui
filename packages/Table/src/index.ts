@@ -1,5 +1,7 @@
-import { Slots, watch, ref } from 'vue'
-import table from './table.vue'
+import { Slots, watch, ref, getCurrentInstance } from 'vue'
+import { getTableDomStore } from '../store/index'
+
+
 export interface TablePropsObject {
     [key: string]: string
 }
@@ -17,10 +19,7 @@ export interface VueDomChildren {
 
 }
 
-// export interface VueDomValue extends Element {
-//     children: Array<VueDom> & VueDomChildren
-//     style: CSSStyleDeclaration
-// }
+
 
 export interface VueDom extends HTMLInputElement {
     // value: string & VueDom
@@ -55,175 +54,15 @@ export interface TableDomStore {
     tableInnerWrapper: VueDom | undefined
     tableHeaderWrapper: VueDom | undefined
     tableBodyWrapper: VueDom | undefined
+    tableHeader: VueDom | undefined
+    tableBody: VueDom | undefined
     tableHeaderRows: VueDom[] | undefined
     tableBodyRows: VueDom[] | undefined
-    tableHeaderColumn: Array<VueDom[]> | undefined
-    tableBodyColumn: Array<VueDom[]> | undefined
-}
-
-/**
- * 获取table列数据
- */
-export function getColumn<T extends VueDom | undefined>(dom: T): Array<VueDom[]> {
-    const ROW_LENGTH = dom?.children.length
-    let arrayDom: Array<VueDom[]> = []
-
-    if (ROW_LENGTH) {
-        const COLUMN_LENGTH = dom.children[0].children.length
-
-        for (let index = 0; index < COLUMN_LENGTH; index++) {
-            let tempArr = []
-
-            for (let index2 = 0; index2 < ROW_LENGTH; index2++) {
-
-                tempArr.push(dom.children[index2].children[index])
-            }
-            arrayDom.push(tempArr)
-
-        }
-    }
-    return arrayDom
-
-}
-/**
- * tableDom库
- * 存储了table的各种节点Dom
- */
-export function getTableDomStore<T extends VueDom | null>(table: T): TableDomStore {
-    const tableInnerWrapper = table?.children[0]                // table内部封装
-    const tableHeaderWrapper = tableInnerWrapper?.children[0]   // tableHeader封装
-    const tableBodyWrapper = tableInnerWrapper?.children[1]     // tableBody封装
-    const tableHeader = tableHeaderWrapper?.children[0]         // tableHeader
-    const tableBody = tableBodyWrapper?.children[0]             // tableBody
-    const tableHeaderRows = tableHeader?.children               // tableHeader行
-    const tableBodyRows = tableBody?.children                   // tableBody行
-    const tableHeaderColumn = getColumn(tableHeader)            // tableHeader列
-    const tableBodyColumn = getColumn(tableBody)                // tableBody列
-
-    return {
-        tableInnerWrapper,
-        tableHeaderWrapper,
-        tableBodyWrapper,
-        tableHeaderRows,
-        tableBodyRows,
-        tableHeaderColumn,
-        tableBodyColumn
-    }
-
+    tableHeaderColumns: Array<VueDom[]> | undefined
+    tableBodyColumns: Array<VueDom[]> | undefined
 }
 
 
-/**
- * table组件数据处理
- * @return store 处理完毕后的数据存放对象
- */
-export function getStore(slots: Slots, props: TableProps): store {
-    const store: store = {
-        tableColumn: [],
-        tableRow: [],
-        tableColumnName: [],  // 列名
-        tableColumnData: [],  // 表格渲染数据
-        tableFixedColumnData: [], // 固定列数据
-        tableColumnSlots: [], // 表格列插槽
-        tableColumnProp: [],  // 表格列传入的数据
-        tableColumnWidth: [], // 表格列宽度
-        tableFixedColumnInfo: [], // 固定列的索引
-        tableWidth: '',         // 表宽度
-        tableIsHeader: false  // 是否显示表头
-    }
-
-    // table宽度
-    store.tableWidth = props.width
-
-    // 是否隐藏头部
-    store.tableIsHeader = props.isHeader
-
-    if (slots?.default) {
-        let count: number = 0
-        slots.default().find((item: any) => {
-            if (item.props) {
-                // 列名
-                if (item.props.label) {
-                    store.tableColumnName.push(item.props.label)
-                } else {
-                    store.tableColumnName.push('')
-                }
-
-                // 列数据源的key名
-                if (item.props.prop) {
-                    store.tableColumnProp.push(item.props.prop)
-                } else {
-                    store.tableColumnProp.push('')
-                }
-
-                // 列宽度
-                if (item.props.width) {
-                    store.tableColumnWidth.push(item.props.width)
-                } else {
-                    store.tableColumnWidth.push('')
-                }
-
-                // 固定列
-                if (item.props.fixed == 'left' || item.props.fixed == 'right') {
-                    store.tableFixedColumnInfo.push({
-                        direction: item.props.fixed,
-                        columnIndex: count
-                    })
-                }
-
-                // 列插槽
-                if (item.children) {
-                    store.tableColumnSlots.push(item.children)
-                } else {
-                    store.tableColumnSlots.push({})
-                }
-
-            }
-
-            count++
-        })
-
-    }
-
-    // 处理渲染数据
-    if (store.tableColumnProp) {
-
-        for (const key in props.data) {
-            let tempArr: Array<any> = []
-            for (const key2 in store.tableColumnProp) {
-
-                if (props.data[key][store.tableColumnProp[key2]]) {
-                    tempArr.push(props.data[key][store.tableColumnProp[key2]])
-                } else {
-                    tempArr.push('')
-                }
-            }
-            store.tableColumnData?.push(tempArr)
-        }
-    }
-
-
-    // // 处理渲染数据2
-    // if (store.tableColumnProp) {
-    //     for (const key in props.data) {
-    //         let tempArr: any = []
-
-    //         for (const key2 in props.data) {
-
-    //             if (props.data[key2][store.tableColumnProp[key]]) {
-    //                 tempArr.push(props.data[key2][store.tableColumnProp[key]])
-    //             } else {
-    //                 tempArr.push('')
-    //             }
-
-    //         }
-    //         store.tableColumnData?.push(tempArr)
-    //     }
-    // }
-
-    return store
-
-}
 /**
  * header 和 body 列宽度同步
  * @param bodyDom 
@@ -245,115 +84,142 @@ export function widthSynchronization<T extends VueDom | undefined>(headerDom: T,
 }
 
 /**
+ * 处理列宽度
+ * @message 给设定了宽度的列的单元设置宽度，同时获取该列的单元宽度进行逐一比对，返回每次比对时更大的值
+ * @return width 宽度比对时更大的那个值 
+ */
+export function columnWidthHandle(table: VueDom, countColumnCellMaxWidth: number, tableColumnWidth: Array<string>, columnIndex: number, columnCellIndex: number): number {
+    let { tableBodyColumns } = getTableDomStore(table)
+    let width: number = countColumnCellMaxWidth
+
+    if (tableBodyColumns) {
+        tableBodyColumns[columnIndex][columnCellIndex].setAttribute('width', tableColumnWidth[columnIndex])
+
+        // 当前列的单元宽度比对算法
+        if (columnCellIndex == 0) {
+            width = tableBodyColumns[columnIndex][columnCellIndex].clientWidth
+        } else if (width < tableBodyColumns[columnIndex][columnCellIndex].clientWidth) {
+            width = tableBodyColumns[columnIndex][columnCellIndex].clientWidth
+        }
+
+    }
+
+    return width
+}
+
+/**
+ * 列宽度调整
+ * @message 根据列宽度最大的单元格的宽度重新设置该列的每一个单元格宽度
+ */
+export function columnWidthAdjust(table: VueDom, countColumnCellMaxWidth: number, columnIndex: number) {
+
+    let { tableBodyColumns } = getTableDomStore(table)
+    if (tableBodyColumns) {
+        for (const key in tableBodyColumns[columnIndex]) {
+
+            let tableColumnCell = tableBodyColumns[columnIndex][key]
+            tableColumnCell.setAttribute('width', `${countColumnCellMaxWidth}px`)
+        }
+    }
+}
+
+/**
+ * 固定列处理
+ * @message 根据table-column传入的fixed属性来给指定列加上固定列的类名
+ */
+export function columnFixedHandle(table: VueDom, tableFixedColumnInfo: Array<tableFixedColumnInfo>, columnIndex: number, columnCellIndex: number) {
+    let { tableBodyColumns, tableHeaderColumns } = getTableDomStore(table)
+
+    if (tableFixedColumnInfo.length > 0) {
+
+        table.setAttribute('class', 'f-table f-table-fixed')
+        tableFixedColumnInfo.find((item: tableFixedColumnInfo) => {
+            if (columnIndex == item.columnIndex && tableBodyColumns && tableHeaderColumns) {
+
+                if (item.direction == 'right') {
+                    tableBodyColumns[columnIndex][columnCellIndex].setAttribute('class', 'f-table-cell f-table-cell-fixed-right')
+                    tableHeaderColumns[columnIndex][0].setAttribute('class', 'f-table-cell f-table-cell-fixed-right')
+                }
+
+                if (item.direction == 'left') {
+                    tableBodyColumns[columnIndex][columnCellIndex].setAttribute('class', 'f-table-cell f-table-cell-fixed-left')
+                    tableHeaderColumns[columnIndex][0].setAttribute('class', 'f-table-cell f-table-cell-fixed-left')
+                }
+            }
+
+        })
+    }
+}
+
+/**
+ * 设置列宽度，固定列
+ * @return tableColumnWidthSum 列宽度总和
+ */
+export function columnHandle(table: VueDom, store: store): number {
+    let tableColumnWidthSum: number = 0
+    let { tableBodyColumns, tableHeaderColumns } = getTableDomStore(table)
+
+
+    if (tableBodyColumns && tableHeaderColumns) {
+        for (let columnIndex = 0; columnIndex < tableBodyColumns?.length; columnIndex++) {
+            let countColumnCellMaxWidth = 0 // 记录列的单元宽度比对时更大的那个值，最终会得到该列宽度最大的单元的宽度
+
+            for (let columnCellIndex = 0; columnCellIndex < tableBodyColumns[columnIndex].length; columnCellIndex++) {
+
+                /**
+                 * 设置列的单元的宽度，并对列的当前的单元和上一个单元的宽度进行比对，返回更大的值
+                 */
+                countColumnCellMaxWidth = columnWidthHandle(table, countColumnCellMaxWidth, store.tableColumnWidth, columnIndex, columnCellIndex)
+
+                /**
+                 * 根据table-column传入的属性设置固定列
+                 */
+                columnFixedHandle(table, store.tableFixedColumnInfo, columnIndex, columnCellIndex)
+
+            }
+            /**
+             * 根据列宽度最大的单元格的宽度重新设置该列的每一个单元格宽度
+             */
+            columnWidthAdjust(table, countColumnCellMaxWidth, columnIndex)
+
+            tableColumnWidthSum += tableBodyColumns[columnIndex][0].clientWidth // 计算列宽度总和
+
+        }
+    }
+    return tableColumnWidthSum
+}
+
+
+/**
  * 设置table样式
  * 
  */
-export function setTableStyle<T extends VueDom | null>(tableWrapper: T, store: store) {
+export function setTableStyle(table: VueDom | null, store: store) {
 
-    if (tableWrapper) {
+    if (table) {
 
-        let tableInnerWrapper = tableWrapper.children[0]
-
-        let tableHeader = tableWrapper.children[0].children[0].children[0].children[0]
-        let tableBody = tableWrapper.children[0].children[1].children[0]
-
-        let tableRow: Array<VueDom> = []
-        let tableColumn: Array<VueDomArray> = []
+        let { tableInnerWrapper } = getTableDomStore(table)
 
         let tableColumnWidthSum: number = 0
-
-        /**
-         * 获取table行DOM
-         */
-        for (let index = 0; index < tableBody.children.length; index++) {
-            // 获取行数据
-            tableRow.push(tableBody.children[index])
-
-        }
-        /**
-         * 获取table列DOM
-         */
-        if (tableRow.length > 0) {
-            const TABLE_ROW_LENGTH = tableRow[0].children.length
-            for (let index = 0; index < TABLE_ROW_LENGTH; index++) {
-                let tempArr = []
-
-                for (let index2 = 0; index2 < tableBody.children.length; index2++) {
-                    tempArr.push(tableBody.children[index2].children[index])
-                }
-                tableColumn.push(tempArr)
-
-            }
-        }
 
         /**
          * 设置table宽度
          */
         if (store.tableWidth) {
-            // tableWrapper.setAttribute('width', store.tableWidth) // 无效？？？
-            tableWrapper.style.width = store.tableWidth
-
+            // table.setAttribute('width', store.tableWidth) // 无效？？？
+            table.style.width = store.tableWidth
         }
 
         /**
-         * 设置列宽度 / 固定列
+         * 处理固定列和列宽度
          */
-        for (const key in tableColumn) {
-            let tableHeaderCell = tableHeader.children[key]  // 当前列的头部
-            let columnWidth = 0
-
-            for (const key2 in tableColumn[key]) {
-
-                let tableColumnCell = tableColumn[key][key2]    // 当前列的单元
-
-                // 设置列宽度
-                tableColumnCell.setAttribute('width', store.tableColumnWidth[key])
-
-                // 获取当前列宽度最大的单元格的宽度
-                if (key2 == '0') {
-                    columnWidth = tableColumnCell.clientWidth
-                } else if (columnWidth < tableColumnCell.clientWidth) {
-                    columnWidth = tableColumnCell.clientWidth
-                }
-
-                // 固定列处理
-                if (store.tableFixedColumnInfo.length > 0) {
-
-                    tableWrapper.setAttribute('class', 'f-table f-table-fixed')
-                    store.tableFixedColumnInfo.find((item: tableFixedColumnInfo) => {
-                        if (parseInt(key) == item.columnIndex) {
-
-                            if (item.direction == 'right') {
-                                tableColumnCell.setAttribute('class', 'f-table-cell f-table-cell-fixed-right')
-                                tableHeaderCell.setAttribute('class', 'f-table-cell f-table-cell-fixed-right')
-                            }
-
-                            if (item.direction == 'left') {
-                                tableColumnCell.setAttribute('class', 'f-table-cell f-table-cell-fixed-left')
-                                tableHeaderCell.setAttribute('class', 'f-table-cell f-table-cell-fixed-left')
-                            }
-                        }
-
-                    })
-                }
-
-            }
-            // 列宽度 == 当前列宽度最大的单元格的宽度
-            for (const key2 in tableColumn[key]) {
-
-                let tableColumnCell = tableColumn[key][key2]
-                tableColumnCell.setAttribute('width', `${columnWidth}px`)
-            }
-            tableColumnWidthSum += tableColumn[key][0].clientWidth
-
-        }
-
+        tableColumnWidthSum = columnHandle(table, store)
 
         /**
-          * 设置tableHeader / tableBody 宽度
-          */
-        // tableInnerWrapper.setAttribute('width', `${tableColumnWidthSum}px`) // 无效？？？
-        tableInnerWrapper.style.width = `${tableColumnWidthSum}px`
+         * 设置tableInnerWrapper宽度
+         */
+        if (tableInnerWrapper) {
+            tableInnerWrapper.style.width = `${tableColumnWidthSum}px`
+        }
     }
-
 }

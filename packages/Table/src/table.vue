@@ -25,7 +25,8 @@
 </template>
 <script lang="ts" >
 import { defineComponent, nextTick, onMounted, ref } from 'vue'
-import { getStore, widthSynchronization, VueDom, setTableStyle, store, getTableDomStore } from './index'
+import { widthSynchronization, VueDom, setTableStyle, store } from './index'
+import { getStore, getTableDomStore } from '../store/index'
 import { sliderBarHandle } from './table-slider'
 import TableColumn from './table-column'
 import TableHeader from './table-header'
@@ -53,14 +54,7 @@ export default defineComponent({
          * 初始化方法
          */
         function initialization() {
-            let {
-                tableInnerWrapper,
-                tableHeaderWrapper,
-                tableBodyWrapper
-            } = getTableDomStore(tableWrapper.value)
-
-            let tableHeader = headerWrapper.value?.children[0]
-            let tableBody = bodyWrapper.value?.children[0]
+            let { tableHeader, tableBody } = getTableDomStore(tableWrapper.value)
 
             /**
             * 设置table样式
