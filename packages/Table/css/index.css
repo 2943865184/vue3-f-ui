@@ -23,6 +23,7 @@
   word-break: break-all;
 }
 .f-table-fixed {
+  position: relative;
   overflow: hidden;
 }
 .f-table-fixed .table-inner-wrapper {
@@ -44,16 +45,11 @@
 }
 .f-table-fixed .table-inner-wrapper .f-table-cell-fixed-left,
 .f-table-fixed .table-inner-wrapper .f-table-cell-fixed-right {
+  border-spacing: 0;
   box-sizing: border-box;
   position: sticky;
   background: #fff;
   z-index: 1;
-}
-.f-table-fixed .table-inner-wrapper .f-table-cell-fixed-left {
-  left: 0;
-}
-.f-table-fixed .table-inner-wrapper .f-table-cell-fixed-right {
-  right: 0;
 }
 .slider-bar {
   border-radius: 5px;

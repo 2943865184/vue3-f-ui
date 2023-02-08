@@ -1,5 +1,5 @@
 
-import { VueDom, TablePropsObject } from '../src/index'
+import { VueDom, indexSignatureString } from '../src/index'
 /**
  * 获取table列数据
  */
@@ -22,7 +22,35 @@ export function getColumn<T extends VueDom | undefined>(dom: T): Array<VueDom[]>
         }
     }
     return arrayDom
+}
 
+/**
+ * 将header的列和body的列进行合并
+ */
+export function sameIndexMerge<T extends Array<VueDom[]>>(headerColumns: T, bodyColumns: T) {
+
+    const COLUMN_LENGTH = headerColumns.length
+    const ROW_LENGTH = headerColumns[0].length + bodyColumns[0].length
+
+    let tableColumn: Array<VueDom[]> = []
+
+    for (let columnIndex = 0; columnIndex < COLUMN_LENGTH; columnIndex++) {
+        let tempArr = []
+        for (let cellIndex = 0; cellIndex < ROW_LENGTH; cellIndex++) {
+
+            if (cellIndex == 0) {
+                tempArr.push(headerColumns[columnIndex][0])
+                continue
+            }
+
+            tempArr.push(bodyColumns[columnIndex][cellIndex - 1])
+
+        }
+        tableColumn.push(tempArr)
+    }
+
+
+    return tableColumn
 }
 
 
@@ -30,7 +58,7 @@ export function getColumn<T extends VueDom | undefined>(dom: T): Array<VueDom[]>
  * 将table组件传入的数据处理成渲染所需的数据
  * 根据prop中的元素从data中提取指定的值
  */
-export function getRenderData(prop: Array<string>, data: Array<TablePropsObject>): Array<object> {
+export function getRenderData(prop: Array<string>, data: Array<indexSignatureString>): Array<object> {
     let renderData: Array<object> = []
 
     if (prop) {

@@ -1,6 +1,6 @@
 import { Slots } from 'vue'
 import { VueDom, TableDomStore, store, TableProps } from '../src/index'
-import { getColumn, getRenderData } from './helper'
+import { getColumn, getRenderData, sameIndexMerge } from './helper'
 
 
 
@@ -31,7 +31,8 @@ export function getStore(slots: Slots, props: TableProps): store {
     if (slots?.default) {
         let count: number = 0
         slots.default().find((item: any) => {
-            if (item.props) {
+
+            if (item.props && typeof item.type == 'object') {
                 // 列名
                 if (item.props.label) {
                     store.tableColumnName.push(item.props.label)
@@ -57,7 +58,8 @@ export function getStore(slots: Slots, props: TableProps): store {
                 if (item.props.fixed == 'left' || item.props.fixed == 'right') {
                     store.tableFixedColumnInfo.push({
                         direction: item.props.fixed,
-                        columnIndex: count
+                        columnIndex: count,
+                        columnWidth: 0
                     })
                 }
 
@@ -68,9 +70,10 @@ export function getStore(slots: Slots, props: TableProps): store {
                     store.tableColumnSlots.push({})
                 }
 
+                count++
+
             }
 
-            count++
         })
 
     }
@@ -107,17 +110,20 @@ export function getStore(slots: Slots, props: TableProps): store {
  * 存储了table的各种节点Dom
  */
 export function getTableDomStore<T extends VueDom | null>(table: T): TableDomStore {
-    const tableInnerWrapper = table?.children[0]                // table内部封装
-    const tableHeaderWrapper = tableInnerWrapper?.children[0]   // tableHeader封装
-    const tableBodyWrapper = tableInnerWrapper?.children[1]     // tableBody封装
-    const tableHeader = tableHeaderWrapper?.children[0]         // tableHeader
-    const tableBody = tableBodyWrapper?.children[0]             // tableBody
-    const tableHeaderRows = tableHeader?.children               // tableHeader行
-    const tableBodyRows = tableBody?.children                   // tableBody行
-    const tableHeaderColumns = getColumn(tableHeader)            // tableHeader列
-    const tableBodyColumns = getColumn(tableBody)                // tableBody列
+    const tableWrapper = table
+    const tableInnerWrapper = table?.children[0]                              // table内部封装
+    const tableHeaderWrapper = tableInnerWrapper?.children[0]                 // tableHeader封装
+    const tableBodyWrapper = tableInnerWrapper?.children[1]                   // tableBody封装
+    const tableHeader = tableHeaderWrapper?.children[0]                       // tableHeader
+    const tableBody = tableBodyWrapper?.children[0]                           // tableBody
+    const tableHeaderRows = tableHeader?.children                             // tableHeader行
+    const tableBodyRows = tableBody?.children                                 // tableBody行
+    const tableHeaderColumns = getColumn(tableHeader)                         // tableHeader列
+    const tableBodyColumns = getColumn(tableBody)                             // tableBody列
+    const tableColumns = sameIndexMerge(tableHeaderColumns, tableBodyColumns) // table列
 
     return {
+        tableWrapper,
         tableInnerWrapper,
         tableHeaderWrapper,
         tableBodyWrapper,
@@ -126,7 +132,8 @@ export function getTableDomStore<T extends VueDom | null>(table: T): TableDomSto
         tableHeaderRows,
         tableBodyRows,
         tableHeaderColumns,
-        tableBodyColumns
+        tableBodyColumns,
+        tableColumns
     }
 
 }

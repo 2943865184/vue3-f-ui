@@ -24,8 +24,8 @@
 
 </template>
 <script lang="ts" >
-import { defineComponent, nextTick, onMounted, ref } from 'vue'
-import { widthSynchronization, VueDom, setTableStyle, store } from './index'
+import { defineComponent,  onMounted, ref } from 'vue'
+import { VueDom, setTableStyle, store } from './index'
 import { getStore, getTableDomStore } from '../store/index'
 import { sliderBarHandle } from './table-slider'
 import TableColumn from './table-column'
@@ -49,29 +49,21 @@ export default defineComponent({
         const sliderBar = ref<VueDom | null>(null)
 
         let store: store = getStore(slots, props)
-
         /**
          * 初始化方法
          */
         function initialization() {
-            let { tableHeader, tableBody } = getTableDomStore(tableWrapper.value)
+            let tableDomStore = getTableDomStore(tableWrapper.value)
 
             /**
             * 设置table样式
             */
-            if (tableHeader && tableBody) {
-                setTableStyle(tableWrapper.value, store)
+            setTableStyle(tableDomStore, store)
+            /**
+             * 滚动条逻辑
+             */
+            sliderBarHandle(sliderBar.value, tableDomStore)
 
-                nextTick(() => {
-
-                    widthSynchronization(tableHeader, tableBody)
-
-                    if (sliderBar && tableWrapper) {
-
-                        sliderBarHandle(sliderBar.value, tableWrapper.value)
-                    }
-                })
-            }
 
         }
 
